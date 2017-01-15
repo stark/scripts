@@ -20,7 +20,7 @@ set_fmt() {
 			FMT='%d '
 			;;
 		2) # Single line output printing only a single value:
-			FMT="\033[1G%-${NB}d"
+			FMT="\033[K%d\r"
 			;;
 		3) # Multiline vertical output:
 		   # 1
