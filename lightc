@@ -1,0 +1,78 @@
+#!/bin/sh
+# lightc A small wrapper around light for setting the display's brightness
+# depends on: https://github.com/haikarainen/light
+
+_usage()
+{
+	cat <<- EOF
+usage: $(basename $0) [+ | -] Value
+       Value can either be an integer or a fractional number
+
+    +n | + n  Increase brightness using the n step value where n is the user argument
+    -n | - n  Decrease brightness using the n step value
+    +         Increase brightness using the default step value
+    -         Decrease brightness using the default step value
+    n         Directly set the value where n is a value provided by the user
+    c | p     Print the current brightness
+	EOF
+}
+
+# Check if the program exists in our $PATH
+test ! "$(command -v light 2>/dev/null)" && {
+	printf 'The program %s was not found in your $PATH\n' "'light'"
+	printf 'If not installed, get it from here: %s\n' 'https://github.com/haikarainen/light'
+	exit 127
+}
+
+# Show the usage when no argument(s) provided
+test $# -lt 1 && {
+	printf '\033[31mError:\033[0m %s\n' 'No arguments provided'
+	_usage && exit 1
+}
+
+# User argument
+ARG="$*"
+# Default Step value
+STEP=${STEP:-5}
+
+current_b() {
+	# Print the current brightness of the display
+	light -G
+}
+
+set_b() {
+	# Set the display's brightness relatively
+	VALUE=$(echo "scale=1; $(current_b) $1" | bc)
+	light -S $VALUE
+}
+
+case "$ARG" in
+	+[0-9]* | +\ [0-9]* | +.[0-9]* | +\ .[0-9]*)
+		set_b "$ARG"
+		current_b
+		;;
+	-[0-9]* | -\ [0-9]* | -.[0-9]* | -\ .[0-9]*)
+		set_b "$ARG"
+		current_b
+		;;
+	'+' | inc)
+		set_b "+ $STEP"
+		current_b
+		;;
+	'-' | dec)
+		set_b "- $STEP"
+		;;
+	[0-9])
+		light -S $1
+		current_b
+		;;
+	c|p)
+		current_b
+		;;
+	*)
+		_usage && exit 1
+		;;
+esac
+
+exit $?
+# vim: set ft=sh noet:
