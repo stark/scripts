@@ -1,0 +1,75 @@
+#!/bin/sh
+# vsleep: visual sleep
+
+_usage() {
+	printf '\nusage: %s: [-d delay] [-r delay (print in reverse)] [-f format <1 2 3>] Where delay should be an integer\n' "$(basename $0)"
+}
+
+[ $# -lt 1 ] && {
+	printf 'Error: %s\n' 'No arguments provided'
+	_usage && exit 1
+}
+
+# Number Bytes
+NB=$(echo "$*" | tr -cd '0-9' | wc -c)
+
+set_fmt() {
+	case $1 in
+		1) # Single line output: 1 2 3
+			FMT='%d '
+			;;
+		2) # Single line output printing only a single value:
+			FMT="\033[1G%-${NB}d"
+			;;
+		3) # Multiline vertical output:
+		   # 1
+		   # 2
+		   # 3
+			FMT="%-${NB}d\n"
+			;;
+		*)
+			printf 'Error: %s\n%s\n' 'Invalid option' 'Available Formats: <1 2 3>'
+			exit 1
+	esac
+}
+
+while getopts 'hd:r:f:' OPT; do
+	case "$OPT" in
+		d) # Delay
+			NUMS="$(seq $OPTARG)"
+			;;
+		r) # Reverse countdown
+			NUMS="$(seq $OPTARG | sort -rn)"
+			;;
+		h) # Show Usage
+			_usage && exit 0
+			;;
+		f) # Set the printing format
+			set_fmt $OPTARG
+			;;
+		*)
+			printf 'Error: %s\n' 'Unknown option'
+			_usage && exit 1
+			;;
+	esac
+done
+
+shift $((OPTIND - 1))
+
+# Default format for printing numbers
+[ -z "$FMT" ] && set_fmt 1
+
+# hide cursor
+tput civis
+
+for N in $NUMS; do
+	printf "$FMT" "$N" && sleep 1
+done
+
+# Newline
+echo
+# show cursor
+tput cnorm
+
+exit $?
+# vim: set ft=sh noet:
