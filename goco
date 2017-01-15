@@ -1,0 +1,112 @@
+#!/bin/sh
+# Author: stark <stark at openmailbox dot org>
+# goco -- Simple script for extracting color codes from Xresource database
+
+# Comment this var if you do not want to strip '#' from the color codes
+REMOVE_PREFIX='-F#'
+
+# Script name
+PROGNAME="$(basename $0)"
+
+_usage() {
+	cat <<- HELP
+    $PROGNAME <options>
+
+Options:
+
+    bg      - Display the background color
+    fg      - Display the foreground color
+    0 to 7  - Display the normal colors
+    8 to 15 - Display the bold   colors
+
+    You can also use names instead of color numbers:
+      0    1    2    3    4    5    6    7
+    blkf redf grnf ylwf bluf magf cynf whtf
+    blkb redb grnb ylwb blub magb cynb whtb
+      8    9   10   11   12   13   14   15
+
+Examples:
+
+    Display color 2 (grnf) and color 3 (ylwf)
+    $PROGNAME 2 3
+
+    Same as above just using their equivalent names instead of numbers
+    $PROGNAME grnf ylwf
+
+    Displays all the 18 colors along with background and foreground:
+    $PROGNAME bg fg \`seq 0 15\`
+
+	HELP
+}
+
+[ $# -lt 1 ] && printf "Error: %s\n" 'No options specified' && _usage && exit 1
+
+# Color query
+colq() {
+	case $1 in
+		bg)
+			# Background
+			xrdb -query | awk $REMOVE_PREFIX '/background/ {print $2}'
+			;;
+		fg)
+			# Foreground
+			xrdb -query | awk $REMOVE_PREFIX '/foreground/ {print $2}'
+			;;
+		[0-9] | 1[0-5])
+			# Color 0 to 15
+			sh -c "xrdb -query | awk $REMOVE_PREFIX '/^\*color$1:/ {print \$2}'"
+			;;
+		*)
+			printf 'Error: %s\n' 'Invalid color number/name'
+			_usage && exit 1
+			;;
+	esac
+}
+
+for OPT in $@; do
+	case $OPT in
+		bg)        colq bg
+			;;
+		fg)        colq fg
+			;;
+		blkf | 0)  colq 0
+			;;
+		redf | 1)  colq 1
+			;;
+		grnf | 2)  colq 2
+			;;
+		ylwf | 3)  colq 3
+			;;
+		bluf | 4)  colq 4
+			;;
+		magf | 5)  colq 5
+			;;
+		cynf | 6)  colq 6
+			;;
+		whtf | 7)  colq 7
+			;;
+		blkb | 8)  colq 8
+			;;
+		redb | 9)  colq 9
+			;;
+		grnb | 10) colq 10
+			;;
+		ylwb | 11) colq 11
+			;;
+		blub | 12) colq 12
+			;;
+		magb | 13) colq 13
+			;;
+		cynb | 14) colq 14
+			;;
+		whtb | 15) colq 15
+			;;
+		*)
+			printf 'Error: %s\n' 'Unknown Option'
+			_usage && exit 1
+			;;
+	esac
+done
+
+exit $?
+# vim: set ft=sh noet:

@@ -1,0 +1,47 @@
+#!/bin/sh
+# About: Put the computer to sleep based on connman's network connection state
+# Enter Sleep mode when state is idle or there are 5 consecutive icmp time outs
+
+# Get the current state of connman's network connection
+STATE="$(connmanctl state | awk -F= 'NR==1 {print $2}' | tr -d ' ')"
+
+# Color definitions using escape codes
+RED="[31m" GRN="[1;32m" BLU="[34m" YLW="[33m" RST="[0m"
+
+goto_sleep() {
+	printf "$YLW==>$BLU %s$RST" 'Putting the computer to sleep in: '
+	vsleep -r 5
+	systemctl suspend
+}
+
+print_state() {
+	DATE="%a %d %b %Y"
+	TIME="${BLU}%I:%M:%S %p${RST}"
+	STATE="${1}${STATE}${RST}"
+
+	date +"$STATE on $DATE at $TIME"
+}
+ping_check() {
+	printf "$YLW==>$BLU %s$RST\n" 'Checking for ICMP replies'
+	ping -c 5 google.com
+}
+case "$STATE" in
+	online)
+		# If 'online' do nothing
+		print_state $GRN
+		;;
+	ready)
+		# If 'ready' then check for ping replies
+		# If there are 5 consecutive time outs then put the computer to sleep
+		# Else do nothing
+		print_state $YLW
+		ping_check || goto_sleep
+		;;
+	idle)
+		# If 'idle' then put the computer to sleep
+		print_state $RED && goto_sleep
+		;;
+esac
+
+exit $?
+# vim: set ft=sh noet:

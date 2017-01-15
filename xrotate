@@ -1,0 +1,17 @@
+#!/bin/sh
+# Simple xrandr wrapper for changing the orientation of the active monitor
+
+OPTS='normal left right inverted'
+OUT=$(xrandr --current | awk 'NR==2 {print $1}')
+alias ts='tput setaf'
+
+while tput clear; do
+	echo '^C or press q to exit\n'
+	echo "$OPTS" | tr ' ' '\n' | nl | sed "s/[0-9]/$(ts 3)&$(ts 4)/g"
+	read OPT
+	[ "$OPT" = q ] && { echo '\nExiting ...'; exit 0; }
+	xrandr --output $OUT --rotate $(echo "$OPTS" | cut -d ' ' -f $OPT)
+done
+
+exit $?
+#vim: set ft=sh noet:

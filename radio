@@ -1,0 +1,15 @@
+#!/bin/sh
+# Simple radio script
+
+# List of streams
+LIST=$HOME/etc/radio/list
+
+URL="$(cut -d ' ' -f1 $LIST | dmenu -l 10 | xargs -I {} awk -F' ' "/{}/ {print \$2}" $LIST)"
+
+if [ -z "$URL" ]
+	printf 'Error: %s\n' 'No url provided' && exit 1
+else
+	amp "$URL"
+fi
+
+exit $?
