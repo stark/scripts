@@ -1,0 +1,22 @@
+#!/bin/sh
+# streaming with mpv
+
+# requires: youtube-dl
+
+# Uncomment PRINTMOD, so that mpv prepends module name to each console message.
+# Helpful when we want to disable a particular module through --msg-level
+#PRINTMOD='--msg-module'
+
+#MSG_LVL='cplayer=no:ffmpeg/demuxer=no:ffmpeg/audio=no:ad=no'
+
+#OPTS="--msg-level=$MSG_LVL"
+OPTS="$PRINTMOD --force-window --really-quiet --loop-file=yes"
+
+if echo "$*" | grep -qi "youtube\|youtu.be"; then
+	FMT='--ytdl-format=18'
+fi
+
+exec mpv $OPTS $FMT "$*" 2> /dev/null &
+
+exit $?
+# vim: set ft=sh:
