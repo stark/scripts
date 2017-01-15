@@ -1,20 +1,16 @@
 #!/bin/sh
 # Helper script to turn the touchpad on/off
-#state=$(synclient -l | grep "TouchpadOff.*=.*0" | tr -d "A-Z a-z =")
 
-_off()
-{
+_off() {
 	synclient TouchpadOff=1 && printf  'Touchpad \033[33;7m %s \n' "Off"
 }
 
-_on()
-{
+_on() {
 	synclient TouchpadOff=0 && printf  'Touchpad \033[32;7m %s \n' "On"
 }
 
-_toggle()
-{
-	local state=$(synclient -l | grep "TouchpadOff" | tr -cd "0-1")
+_toggle() {
+	state=$(synclient -l | grep "TouchpadOff" | tr -cd "0-1")
 
 	case $state in
 		0) _off ;;
