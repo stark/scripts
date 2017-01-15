@@ -13,6 +13,10 @@ YLW="$(tput setaf 3)"
 # Reset
 RST="$(tput sgr0)"
 
+# date(1p) format
+DATE="%a %d %b %Y"
+TIME="${BLU}%I:%M:%S %p${RST}"
+
 goto_sleep() {
 	printf "$YLW==>$BLU %s$RST" 'Putting the computer to sleep in: '
 	vsleep -r 5
@@ -20,11 +24,7 @@ goto_sleep() {
 }
 
 print_state() {
-	DATE="%a %d %b %Y"
-	TIME="${BLU}%I:%M:%S %p${RST}"
-	STATE="${1}${STATE}${RST}"
-
-	date +"$STATE on $DATE at $TIME"
+	date +"${1}${STATE}${RST} on $DATE at $TIME"
 }
 ping_check() {
 	printf "$YLW==>$BLU %s$RST\n" 'Checking for ICMP replies'
