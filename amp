@@ -16,5 +16,5 @@ mpv $OPTS "$@"
 # Show the cursor
 tput cnorm
 
-exit 0
+exit $?
 # vim: set ft=sh:

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# About: Continue an interrupted scp transfer via rsync(1)
+
+# rsync Options
+OPTS='--partial --progress --verbose --compress --compress-level=8 --rsh=ssh'
+
+test $# -lt 1 && {
+	printf 'Error: %s\n' 'No arguments provided'
+	exit 1
+}
+
+rsync $OPTS "$@"
+
+exit $?
+# vim: set ft=sh:

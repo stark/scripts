@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# https://superuser.com/questions/377343/cut-part-from-video-file-from-start-position-to-end-position-with-ffmpeg
+[ $# -lt 3 ] && echo "$(basename $0) FILE 00:00:00 0" && exit 1
+
+FILE="$1"
+OUT="out.$(basename "$FILE")"
+# Start time
+S="$2"
+# Cut Duration
+T="$3"
+
+ffmpeg -ss $S -i "$FILE" -t $T -c copy $OUT
+
+exit $?

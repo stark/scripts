@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Faster scp
+# Source: http://superuser.com/questions/193952/why-is-rsync-avz-faster-than-scp-r
+
+exec scp -C -o 'CompressionLevel 9' -o 'IPQoS throughput'  -c arcfour $@
+
+exit $?
+# vim: set ft=sh:

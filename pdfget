@@ -1,0 +1,10 @@
+#!/bin/sh
+# depends: http://wkhtmltopdf.org/
+
+URL="$*"
+OUT="$(basename $URL).pdf"
+
+wkhtmltopdf $URL $OUT
+
+exit 0
+# vim: set ft=sh noet:
