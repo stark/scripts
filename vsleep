@@ -1,5 +1,6 @@
 #!/bin/sh
 # vsleep: visual sleep
+# Example usage:  vsleep -r 5 -f2
 
 _usage() {
 	printf '\nusage: %s: [-d delay] [-r delay (print in reverse)] [-f format <1 2 3>] Where delay should be an integer\n' "$(basename $0)"
