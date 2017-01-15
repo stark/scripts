@@ -6,7 +6,12 @@
 STATE="$(connmanctl state | awk -F= 'NR==1 {print $2}' | tr -d ' ')"
 
 # Color definitions using escape codes
-RED="[31m" GRN="[1;32m" BLU="[34m" YLW="[33m" RST="[0m"
+RED="$(tput setaf 1)"
+GRN="$(tput setaf 2)"
+BLU="$(tput setaf 4)"
+YLW="$(tput setaf 3)"
+# Reset
+RST="$(tput sgr0)"
 
 goto_sleep() {
 	printf "$YLW==>$BLU %s$RST" 'Putting the computer to sleep in: '
