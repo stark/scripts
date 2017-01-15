@@ -1,0 +1,16 @@
+#!/bin/sh
+
+MAX_OPEN=100
+MAX_UPLOAD_SPEED=35K
+
+OPTS="--bt-enable-lpd=true \
+	--bt-max-open-files=$MAX_OPEN \
+	--max-overall-upload-limit=$MAX_UPLOAD_SPEED \
+	--file-allocation=none "
+#	--check-integrity=true
+
+for t in "$@"; do
+	aria2c $OPTS "$t"
+done
+
+exit $?
