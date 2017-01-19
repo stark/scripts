@@ -8,108 +8,42 @@ for KEY in "$@"; do
 		[A-Za-z0-9])
 			xkey $KEY
 			;;
-		'`')
-			xkey grave
-			;;
+		'`') xkey grave ;;
 		'~')
-			xkey asciitilde
-			;;
-		'!')
-			xkey exclam
-			;;
-		'@')
-			xkey at
-			;;
-		'#')
-			xkey numbersign
-			;;
-		'$')
-			xkey dollar
-			;;
-		'%')
-			xkey percent
-			;;
-		'^')
-			xkey asciicircum
-			;;
-		'&')
-			xkey ampersand
-			;;
-		'*')
-			xkey asterisk
-			;;
-		'(')
-			xkey parenleft
-			;;
-		')')
-			xkey parenright
-			;;
-		'-')
-			xkey minus
-			;;
-		'_')
-			xkey underscore
-			;;
-		'+')
-			xkey plus
-			;;
-		'=')
-			xkey equal
-			;;
-		'[')
-			xkey bracketleft
-			;;
-		']')
-			xkey bracketright
-			;;
-		'{')
-			xkey braceleft
-			;;
-		'}')
-			xkey braceright
-			;;
-		'\\')
-			xkey backslash
-			;;
-		'|' | pipe)
-			xkey bar
-			;;
-		';')
-			xkey semicolon
-			;;
-		':')
-			xkey colon
-			;;
-		"'")
-			xkey apostrophe
-			;;
-		'"')
-			xkey quotedbl
-			;;
-		',')
-			xkey comma
-			;;
-		'.')
-			xkey period
-			;;
-		'<')
-			xkey less
-			;;
-		'>')
-			xkey greater
-			;;
-		'/')
-			xkey slash
-			;;
-		'?')
-			xkey question
-			;;
-		space)
-			xkey $KEY
-			;;
-		return)
-			xkey Return
-			;;
+xkey asciitilde
+;;
+		'!') xkey exclam ;;
+		'@') xkey at ;;
+		'#') xkey numbersign ;;
+		'$') xkey dollar ;;
+		'%') xkey percent ;;
+		'^') xkey asciicircum ;;
+		'&') xkey ampersand ;;
+		'*') xkey asterisk ;;
+		'(') xkey parenleft ;;
+		')') xkey parenright ;;
+		'-') xkey minus ;;
+		'_') xkey underscore ;;
+		'+') xkey plus ;;
+		'=') xkey equal ;;
+		'[') xkey bracketleft ;;
+		']') xkey bracketright ;;
+		'{') xkey braceleft ;;
+		'}') xkey braceright ;;
+		';') xkey semicolon ;;
+		':') xkey colon ;;
+		"'") xkey apostrophe ;;
+		'"') xkey quotedbl ;;
+		',') xkey comma ;;
+		'.') xkey period ;;
+		'<') xkey less ;;
+		'>') xkey greater ;;
+		'/') xkey slash ;;
+		'?') xkey question ;;
+		'\\') xkey backslash ;;
+		'|' | pipe) xkey bar ;;
+		space) xkey $KEY ;;
+		return) xkey Return ;;
 		*)
 			printf 'Error: %s\n' "$KEY: Unknown key" && exit 1
 			;;
