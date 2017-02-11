@@ -9,9 +9,7 @@ for KEY in "$@"; do
 			xkey $KEY
 			;;
 		'`') xkey grave ;;
-		'~')
-xkey asciitilde
-;;
+		'~') xkey asciitilde ;;
 		'!') xkey exclam ;;
 		'@') xkey at ;;
 		'#') xkey numbersign ;;
