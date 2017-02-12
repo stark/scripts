@@ -6,7 +6,7 @@ LIST=$HOME/etc/radio/list
 
 URL="$(cut -d ' ' -f1 $LIST | dmenu -l 10 | xargs -I {} awk -F' ' "/{}/ {print \$2}" $LIST)"
 
-if [ -z "$URL" ]
+if [ -z "$URL" ]; then
 	printf 'Error: %s\n' 'No url provided' && exit 1
 else
 	amp "$URL"
