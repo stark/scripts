@@ -1,0 +1,35 @@
+#!/bin/sh
+# Simple wrapper for changing the orientation of the current virtual console
+# http://askubuntu.com/a/452772
+
+OPTS='normal clockwise anticlockwise inverted'
+OUT=/sys/class/graphics/fbcon/rotate
+alias ts='tput setaf'
+
+_rotate() {
+	echo $1 | sudo tee $OUT
+}
+
+while tput clear; do
+	echo '^C or press q to exit\n'
+	echo "$OPTS" | tr ' ' '\n' | nl | sed "s/[0-9]/$(ts 3)&$(ts 4)/g"
+	read OPT
+	case $OPT in
+		1) # normal
+			_rotate 0 ;;
+		2) # clockwise
+			_rotate 1 ;;
+		3) # anticlockwise
+			_rotate 3 ;;
+		4) # inverted
+			_rotate 2 ;;
+		q|Q)
+			printf '\nExiting ...' && break ;;
+		*)
+			printf 'Error: %s\n' 'Unknown option' && exit 1 ;;
+	esac
+done
+
+unalias ts
+exit $?
+#vim: set ft=sh noet:
