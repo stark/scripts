@@ -1,8 +1,15 @@
 #!/bin/sh
-# usage: pmenu.sh -u -d 2 $DMENU_OPTS
+# about: personal dmenu front-end for pass
+# usage: pmenu.sh -u -d 2 <dmenu options>
+
+# password store directory
 dir=${PASSWORD_STORE_DIR-$HOME/.password-store}
+# default behavior: do not get the username unless --username is used
 getuser=0
+# default delay for xdotool keystrokes in milliseconds
 delay=1
+# see line 50 for explanation
+nouserkey=';p'
 
 while [ -n "$1" ]; do
 	case "$1" in
@@ -12,8 +19,7 @@ while [ -n "$1" ]; do
 		-d | --delay)
 			shift
 			delay=$1 ;;
-		*)
-			break ;;
+		*) break ;;
 	esac
 done
 
@@ -40,18 +46,17 @@ xkey() {
 
 credentials=$(list | sort | dmenu "$@")
 
-# override --username when the user input from dmenu is "--u"
-# handy if you have set a hotkey to use pmenu with the -u flag all the time,
-# but the current login only needs the password (ex- gmail) saving you an extra keybind and keystroke.
-[ $getuser -eq 1 ] && echo "$credentials" | grep -q '^--u$' && {
+# if the user input from dmenu is $nouserkey, do not get the username even if --username flag is used.
+# handy if you have set a hotkey/keybind to use pmenu with the --username flag all the time,
+# but the current login only needs the password (ex- gmail) saving you an extra keybind.
+[ $getuser -eq 1 ] && echo "$credentials" | grep -q "^${nouserkey}$" && \
 	getuser=0 && credentials=$(list | sort | dmenu "$@")
-}
 
 [ -z "$credentials" ] && exit 1
 
 if [ $getuser -eq 1 ]; then
 	get_field username | xtype && xkey Tab && \
-		get_field password | xtype && xkey Tab && xkey Return
+	get_field password | xtype && xkey Tab && xkey Return
 else
 	get_field password | xtype
 fi
