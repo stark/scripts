@@ -1,7 +1,4 @@
 #!/bin/sh
-# streaming with mpv
-
-# requires: youtube-dl
 
 # Uncomment PRINTMOD, so that mpv prepends module name to each console message.
 # Helpful when we want to disable a particular module through --msg-level
@@ -12,8 +9,22 @@
 #OPTS="--msg-level=$MSG_LVL"
 OPTS="$PRINTMOD --force-window --really-quiet --loop-file=yes"
 
-if echo "$*" | grep -qi "youtube\|youtu.be"; then
-	FMT='--ytdl-format=18'
+_ytfmt() {
+	printf '%s\n' 360p 720p 1080p Live \
+		| dmenu -l 4 -w 200 -p Resolution: \
+		| xargs -I _FMT sh -c "
+
+			case _FMT in
+				1080p) echo 137 ;;
+				 720p) echo 22  ;;
+			 360p | *) echo 18  ;;
+				 Live) echo 93  ;;
+			esac
+"
+}
+
+if echo "$*" | grep -Eqi "youtube|youtu.be"; then
+	FMT="--ytdl-format=$(_ytfmt)"
 fi
 
 exec mpv $OPTS $FMT "$*" 2> /dev/null &
