@@ -41,7 +41,7 @@ xkey() {
 credentials=$(list | sort | dmenu "$@")
 
 # override --username when the user input from dmenu is "--u"
-# handw if you have set a hotkey to use pmenu with the -u flag all the time,
+# handy if you have set a hotkey to use pmenu with the -u flag all the time,
 # but the current login only needs the password (ex- gmail) saving you an extra keybind and keystroke.
 [ $getuser -eq 1 ] && echo "$credentials" | grep -q '^--u$' && {
 	getuser=0 && credentials=$(list | sort | dmenu "$@")
