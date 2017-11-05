@@ -7,9 +7,9 @@ dir=${PASSWORD_STORE_DIR-$HOME/.password-store}
 # default behavior: do not get the username unless --username is used
 getuser=0
 # default delay for xdotool keystrokes in milliseconds
-delay=1
-# see line 50 for explanation
-nouserkey=';p'
+delay=5
+# special command. see line 50 for explanation
+rmuserflag=';p'
 
 while [ -n "$1" ]; do
 	case "$1" in
@@ -18,8 +18,10 @@ while [ -n "$1" ]; do
 			shift ;;
 		-d | --delay)
 			shift
-			delay=$1 ;;
-		*) break ;;
+			delay=$1
+			shift ;;
+		*)
+			break ;;
 	esac
 done
 
@@ -46,10 +48,10 @@ xkey() {
 
 credentials=$(list | sort | dmenu "$@")
 
-# if the user input from dmenu is $nouserkey, do not get the username even if --username flag is used.
-# handy if you have set a hotkey/keybind to use pmenu with the --username flag all the time,
-# but the current login only needs the password (ex- gmail) saving you an extra keybind.
-[ $getuser -eq 1 ] && echo "$credentials" | grep -q "^${nouserkey}$" && \
+# if $credentials == $rmuserflag, then do not get the username even if --username flag is used.
+# handy if you have setup a hotkey/keybind to use pmenu with the --username flag, but you only
+# need the password for the current login (ex: gmail), so this saves you an extra keybind.
+[ $getuser -eq 1 ] && echo "$credentials" | grep -q "^${rmuserflag}$" && \
 	getuser=0 && credentials=$(list | sort | dmenu "$@")
 
 [ -z "$credentials" ] && exit 1
