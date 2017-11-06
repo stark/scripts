@@ -1,9 +1,9 @@
 #!/bin/sh
 # about: personal dmenu front-end for pass
-# usage: passget.sh -u -d 2 <dmenu options>
+# usage: passget -u -d 2 <dmenu options>
 
 # password store directory
-dir=${PASSWORD_STORE_DIR-$HOME/.password-store}
+dir=${PASSWORD_STORE_DIR:-$HOME/.password-store}
 # default behavior: do not get the username unless --username is used
 getuser=0
 # default delay for xdotool keystrokes in milliseconds
@@ -18,11 +18,11 @@ while [ -n "$1" ]; do
 			shift ;;
 		-d | --delay)
 			shift
-			delay=$1
-			shift ;;
+			delay=$1 ;;
 		*)
 			break ;;
 	esac
+	shift
 done
 
 list() {
@@ -31,7 +31,7 @@ list() {
 	#       strip dir:  $dir/       -----.               |         |
 	#                                    |               |         |
 	#                                    |               |         |
-	find $dir -type f -name *.gpg | sed "s#"${dir}/"##g; /^.gpg/d; s/.gpg$//g"
+	find $dir -type f -name *.gpg | sed "s#^"${dir}/"##g; /^.gpg/d; s/.gpg$//g"
 }
 
 get_field() {
