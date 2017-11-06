@@ -26,11 +26,11 @@ while [ -n "$1" ]; do
 done
 
 list() {
-	#       strip extension: .gpg ---------------------------------.
-	#       strip file: $dir/.gpg  ----------------------.         |
-	#       strip dir:  $dir/       -----.               |         |
-	#                                    |               |         |
-	#                                    |               |         |
+	#       strip extension: .gpg ----------------------------------.
+	#       strip file: $dir/.gpg  -----------------------.         |
+	#       strip dir:  $dir/       -----.                |         |
+	#                                    |                |         |
+	#                                    |                |         |
 	find $dir -type f -name *.gpg | sed "s#^"${dir}/"##g; /^.gpg/d; s/.gpg$//g"
 }
 
@@ -50,7 +50,7 @@ credentials=$(list | sort | dmenu "$@")
 
 # if $credentials == $rmuserflag, then do not get the username even if --username flag is used.
 # handy if you have setup a hotkey/keybind to use passget with the --username flag, but you only
-# need the password for the current login (ex: gmail), so this saves you an extra keybind.
+# need the password for the current login (ex: ssh), so this saves you an extra keybind.
 [ $getuser -eq 1 ] && echo "$credentials" | grep -q "^${rmuserflag}$" && \
 	getuser=0 && credentials=$(list | sort | dmenu "$@")
 
