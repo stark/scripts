@@ -60,9 +60,10 @@ xkey() {
 
 credentials=$(list | dmenu "$@")
 
-# if $credentials == $rmuserflag, then do not get the username even if --username flag is used.
-# handy if you have setup a hotkey/keybind to use passget with the --username flag, but you only
-# need the password for the current login (ex: ssh), so this saves you an extra keybind.
+# if $credentials == $rmuserflag, then do not get the username even if
+# --username flag is used. handy if you have setup a hotkey/keybind to
+# use passget with the --username flag, but you only need the password
+# for the current login (ex: ssh), so this saves you an extra keybind.
 [ $getuser -eq 1 ] && echo "$credentials" | grep -q "^${rmuserflag}$" && \
 	getuser=0 && credentials=$(list | dmenu "$@")
 
