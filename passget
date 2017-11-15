@@ -1,6 +1,8 @@
 #!/bin/sh
-# about: personal dmenu front-end for pass
-# usage: passget -u -d 2 <dmenu options>
+# about: personal dmenu frontend for pass for autotyping username &password.
+# usage: passget -u -d 2 --recent <dmenu options>
+# XXX    if your file/directory names have spaces, the ghost of /dev/null will
+#        haunt you for rest of the storage's life until you /dev/zero out *
 
 # password store directory
 dir=${PASSWORD_STORE_DIR:-$HOME/.password-store}
@@ -8,34 +10,44 @@ dir=${PASSWORD_STORE_DIR:-$HOME/.password-store}
 getuser=0
 # default delay for xdotool keystrokes in milliseconds
 delay=5
-# special command. see line 51 for explanation
+# special command. see line 78 for explanation
 rmuserflag=';p'
 
 while [ -n "$1" ]; do
 	case "$1" in
 		-u | --username)
 			getuser=1
-			shift ;;
+			;;
 		-d | --delay)
 			shift
-			delay=$1 ;;
+			delay=$1
+			;;
+		--recent)
+			# list based on atime (last access time), see ls(1p).
+			list_opt="-u"
+			;;
 		*)
-			break ;;
+			break
+			;;
 	esac
 	shift
 done
 
 list() {
-	#       strip extension: .gpg ----------------------------------.
-	#       strip file: $dir/.gpg  -----------------------.         |
-	#       strip dir:  $dir/       -----.                |         |
-	#                                    |                |         |
-	#                                    |                |         |
-	find $dir -type f -name *.gpg | sed "s#^"${dir}/"##g; /^.gpg/d; s/.gpg$//g"
+	# Before: /home/user/.password-store/passdb/email.gpg
+	# After : passdb/email
+	#
+	find $dir -type f -name *.gpg -exec ls $list_opt "{}" + \
+		| sed "s#^"${dir}/"##g; /^.gpg$/d; s/.gpg$//g"
+	#          |                |          |
+	#          |                |          |
+	#          |                |          `--------   strip extension: .gpg
+	#          |                `--------------------  strip file: $dir/.gpg
+	#          `-------------------------------------- strip dir:  $dir/
 }
 
 get_field() {
-	pass show "$credentials" | awk -v field="$1" '$1 ~ field { printf("%s", $2) }'
+	pass show "$credentials" | awk -v field="$1" '$1 ~ field {printf("%s", $2)}'
 }
 
 xtype() {
@@ -46,21 +58,21 @@ xkey() {
 	xdotool key  --clearmodifiers $1
 }
 
-credentials=$(list | sort | dmenu "$@")
+credentials=$(list | dmenu "$@")
 
 # if $credentials == $rmuserflag, then do not get the username even if --username flag is used.
 # handy if you have setup a hotkey/keybind to use passget with the --username flag, but you only
 # need the password for the current login (ex: ssh), so this saves you an extra keybind.
 [ $getuser -eq 1 ] && echo "$credentials" | grep -q "^${rmuserflag}$" && \
-	getuser=0 && credentials=$(list | sort | dmenu "$@")
+	getuser=0 && credentials=$(list | dmenu "$@")
 
 [ -z "$credentials" ] && exit 1
 
 if [ $getuser -eq 1 ]; then
 	get_field username | xtype && xkey Tab && \
-	get_field password | xtype && xkey Tab && xkey Return
+	get_field password | xtype && xkey Return
 else
-	get_field password | xtype
+	get_field password | xtype && xkey Return
 fi
 
 exit $?
