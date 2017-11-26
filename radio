@@ -6,7 +6,7 @@ alias menu="dmenu -i -l 10"
 # list of urls with station name
 LIST=$HOME/etc/radio/list
 # station name (either provide a exact name from the $LIST or choose using menu
-NAME=${1:-"$(cut -d ' ' -f1 $LIST | menu)"}
+NAME=${1:-"$(cut -d ' ' -f1 $LIST | menu -p "`wc -l < $LIST` Stations")"}
 
 [ -n "$NAME" ] && player "$(awk -v F1="$NAME" '$1 ~ F1 {print $2}' $LIST)" || {
 	printf 'Error: %s\n' 'No url provided'
