@@ -1,0 +1,52 @@
+#!/bin/sh
+# about: do stuff with http URLs
+# inspired by z3bra's link-open script http://git.z3bra.org/scripts/file/link-open.html
+pager="less -siR"
+editor="vim"
+chrome="chromium --process-per-site"
+chrome_p="$chrome --incognito"
+#ff="firefox" # icecat
+#ff_p="$ff --private-window"
+tty_browse="w3m"
+http_dump="w3m -dump"
+xfer="wget -qO-"
+img_open="sxiv -b"
+vplay="yplay"
+aplay="amp"
+
+new_tab="tmux new-window -n"
+pbcopy="xsel -b"
+pbpaste="xsel -o"
+
+TMP=/tmp
+LINK="${1:-"$($pbpaste)"}"
+OUT="$TMP/$(echo $LINK | sed 's/\//+_+/g')"
+
+list_handlers() {
+	printf '%s\n' X-browse X-browse-p TTY-browse View Edit Dload Aplay Vplay Img
+	echo
+}
+
+menu() {
+	FONT1='-windows-proggycleaned-medium-r-normal--13-80-96-96-c-70-iso8859-1'
+	FONT2='-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1'
+	FONT="$FONT1,$FONT2"
+	dmenu -p ''  -fn "$FONT" -i -l $(list_handlers | wc -l) -w 125 -x 5 -y 25 \
+		  -nb "#$(goco bg)" -nf "#$(goco 8)" -sb "#$(goco bg)" -sf "#$(goco 3)"
+}
+
+case "$(list_handlers | sort -r | menu)" in
+	X-browse)    exec $chrome "$LINK" & ;;
+	X-browse-p)  exec $chrome_p "$LINK" & ;;
+	TTY-browse)  $new_tab term-link $tty_browse "$LINK" & ;;
+	View)        $new_tab term-view "$xfer $LINK | $pager" & ;;
+	Edit)        $xfer "$LINK" > "$OUT" && $new_tab term-edit $editor "$OUT" & ;;
+	Dload)       $xfer "$LINK" > "$OUT" & ;;
+	Img)         $xfer "$LINK" > "$OUT" && exec $img_open "$OUT" & ;;
+	Aplay)       $new_tab tune-stream $aplay "$LINK" & ;;
+	Vplay)       exec $vplay "$LINK" & ;;
+	*)           printf 'Error: %s\n' 'Invalid option'  && exit 1 ;;
+esac
+
+exit $?
+# vim set ft=sh noet:
