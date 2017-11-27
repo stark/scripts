@@ -20,7 +20,7 @@ pbpaste="xsel -o"
 
 TMP=/tmp
 LINK="${1:-"$($pbpaste)"}"
-OUT="$TMP/${0##*/}.$(echo $LINK | tr '/' '\').$USER
+OUT="$TMP/${0##*/}.$USER.$(echo $LINK | tr '/' '\')"
 
 list_handlers() {
 	printf '%s\n' X-browse X-browse-p TTY-browse View Edit Dload Aplay Vplay Img
