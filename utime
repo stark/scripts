@@ -1,0 +1,70 @@
+#!/bin/sh
+# about; user time - print local time of the specified nicks
+PROGNAME="${0##*/}"
+# tput is bloat ?
+alias pput="printf '\033[%dm'"
+
+# Color definitions
+YL=$(pput 33)    # Yellow
+BL=$(pput 34)    # Blue
+MG=$(pput 35)    # Magenta
+CY=$(pput 36)    # Cyan
+WH=$(pput 37)    # White
+RS=$(pput  0)    # Reset
+
+list() {
+	# See /usr/share/zoneinfo/
+	cat <<- EOF
+	frolo       US/Pacific           # frodinger from work
+	insomniac   US/Eastern           # a box of jambalaya, jazz records, and h4x
+	xinu        Asia/Beirut          # chill af
+	mkluvin     Europe/Oslo          # brian the cowboy
+	yanker      America/New_York     # duck my life
+	londoneer   UTC                  # dude from the club
+	EOF
+}
+
+usage() {
+	printf 'Usage: %s <nick1> <nick2> <..so on>\n\n' "$PROGNAME"
+	printf '# Show local time for %s\n' "the nick(s) containing the string \"mkluvin\""
+	printf '\n$ %s mkluvin\n\n' "$PROGNAME"
+	sh $0 mkluvin
+	printf '\n# Show local time for %s\n' "the nick that starts with a 'x', ends with an 'u' and has characters ranging from i to u in between"
+	printf '\n$ %s ^x+[i-n]+u$\n\n' "$PROGNAME"
+	sh $0 ^x+[i-n]+u$
+	printf '\n%s\n\n' 'Data available for the following nick(s):'
+	list | cut -d ' ' -f 1 | sort | tr '\n' ' ' | fmt -w 80
+	echo
+}
+
+[ $# -eq 0 ] && {
+	(printf 'Error: %s\n' 'Gimme me a nick YOU !'; usage) >&2
+	exit 1
+}
+
+print_time() {
+	nick="$1"
+	zone="$2"
+	# if nick is longer than 5 chars then trucate and add a suffix
+	[ "$(printf "$nick" | wc -c)" -gt 5 ] && nick="$(printf '%0.5s…' "$nick")"
+
+	sep_f="$(pput 45) $RS"
+	date_f="$WH%a %d %b %Y$RS"
+	time_f="$WH%I:%M:%S $YL%p$RS"
+	zone_f="$BL%4Z$RS %z $ZONE"
+	fmt="$CY $nick%t$sep_f $date_f $sep_f $time_f $zone_f"
+
+	TZ="$zone" date +"$fmt"
+}
+
+fetch() {
+	list | awk -F ' ' -v f="$1" '$1 ~ f { print }' | \
+		   while read data; do print_time $data; done
+}
+
+(for nick in $@; do
+	fetch $nick
+done) | sort | uniq
+
+exit $?
+# vim: set ft=sh noet:
