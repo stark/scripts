@@ -1,16 +1,16 @@
 #!/bin/sh
-# about; user time - print local time of the specified nicks
+# about utime: user time - print local time of the specified nicks
 PROGNAME="${0##*/}"
 # tput is bloat ?
-alias pput="printf '\033[%dm'"
+alias ptput="printf '\033[%dm'"
 
 # Color definitions
-YL=$(pput 33)    # Yellow
-BL=$(pput 34)    # Blue
-MG=$(pput 35)    # Magenta
-CY=$(pput 36)    # Cyan
-WH=$(pput 37)    # White
-RS=$(pput  0)    # Reset
+YL=$(ptput 33)    # Yellow
+BL=$(ptput 34)    # Blue
+MG=$(ptput 35)    # Magenta
+CY=$(ptput 36)    # Cyan
+WH=$(ptput 37)    # White
+RS=$(ptput  0)    # Reset
 
 list() {
 	# See /usr/share/zoneinfo/
@@ -29,7 +29,7 @@ usage() {
 	printf '# Show local time for %s\n' "the nick(s) containing the string \"mkluvin\""
 	printf '\n$ %s mkluvin\n\n' "$PROGNAME"
 	sh $0 mkluvin
-	printf '\n# Show local time for %s\n' "the nick that starts with a 'x', ends with an 'u' and has characters ranging from i to u in between"
+	printf '\n# Show local time for %s\n' "the nick that starts with a 'x', ends with an 'u' and has characters ranging from i to u in between" | fmt -w 80
 	printf '\n$ %s ^x+[i-n]+u$\n\n' "$PROGNAME"
 	sh $0 ^x+[i-n]+u$
 	printf '\n%s\n\n' 'Data available for the following nick(s):'
@@ -48,7 +48,7 @@ print_time() {
 	# if nick is longer than 5 chars then trucate and add a suffix
 	[ "$(printf "$nick" | wc -c)" -gt 5 ] && nick="$(printf '%0.5s…' "$nick")"
 
-	sep_f="$(pput 45) $RS"
+	sep_f="$(ptput 45) $RS"
 	date_f="$WH%a %d %b %Y$RS"
 	time_f="$WH%I:%M:%S $YL%p$RS"
 	zone_f="$BL%4Z$RS %z $ZONE"
