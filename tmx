@@ -8,13 +8,14 @@ TMP="$HOME/tmp"
 # Working Directory
 DIR="$TMP/$STAMP"
 # Default Tmux Session name
-SESSION=scratch
+NAME=${1:-"scratch"}
 
 # If the directory is non-existent then create it
 [ ! -d "$DIR" ] && mkdir -p "$DIR"
 
-# Create a new tmux session with the $SESSION name and $DIR as working directory
-exec tmux new-session -s $SESSION -c "$DIR"
+# Create a new tmux session with the $NAME name and $DIR as working directory
+{ tmux -q has-session -t $NAME && exec tmux attach-session -t $NAME ;} || \
+	exec tmux new-session -n $NAME -s $NAME -c "$DIR"
 
 exit $?
 # vim: set ft=sh:

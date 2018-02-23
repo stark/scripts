@@ -1,0 +1,22 @@
+#!/bin/sh
+# about: choose wisely, what you cast
+
+#WATTR="$(xwininfo | grep -E 'X:|Y:|Width:|Height:' | awk '!/R/ { print $NF }')"
+#wattr() { echo "$WATTR" | awk -v line=$1 'NR==line { print }' ;}
+
+sleep 2
+WATTR="$(slop -q -n -f '%x %y %w %h')"
+wattr() { echo "$WATTR" | cut -d ' ' -f $1 ;}
+
+DIR=/tmp
+OUT="$DIR/wincast+${1:-"$(date +%b-%d-%a-%T)"}.webm"
+
+X=$(wattr 1)
+Y=$(wattr 2)
+W=$(wattr 3)
+H=$(wattr 4)
+
+printf "Press q to quit. Saving to: %s\n" "$OUT"
+ffmpeg -loglevel warning -f x11grab -r 25 -s ${W}x${H} -i $DISPLAY+$X,$Y "$OUT"
+
+exit $?

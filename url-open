@@ -1,6 +1,5 @@
 #!/bin/sh
-# about: do stuff with http URLs
-# inspired by z3bra's link-open script http://git.z3bra.org/scripts/file/link-open.html
+
 pager="less -siR"
 editor="vim"
 chrome="chromium --process-per-site"
@@ -9,21 +8,39 @@ chrome_p="$chrome --incognito"
 #ff_p="$ff --private-window"
 tty_browse="w3m"
 http_dump="w3m -dump"
-xfer="wget -qO-"
 img_open="sxiv -b"
 vplay="yplay"
 aplay="amp"
 
 new_tab="tmux new-window -n"
-pbcopy="xsel -b"
-pbpaste="xsel -o"
+alias pbcopy="xsel -b"
+alias pbpaste="xsel -o"
 
 TMP=/tmp
-LINK="${1:-"$($pbpaste)"}"
-OUT="$TMP/${0##*/}.$USER.$(echo $LINK | tr '/' '\')"
+LINK="${1:-"$(pbpaste)"}"
+PREFIX="$TMP/${0##*/}.$USER."
+OUT="${PREFIX}$(echo $LINK | tr '/' '!')"
+
+[ "$1" = "-l" ] && {
+	space_used=$(du -cs ${PREFIX}* | awk '/total/ && $2 == "total" { print $1 }')
+	space_free=$(df $TMP | awk 'NR==2 { print $4 }')
+
+	printf "%8s\t%s\n" "KB" URL
+	{
+		ls -s -S1 "$PREFIX"* | nl | sed "s/\!/\//g; s#${PREFIX}##"
+
+		echo
+		echo "%  Dir: $TMP"
+		echo "% Used: $(echo "scale=2; $space_used / 1024" | bc)M"
+		echo "% Free: $(echo "scale=2; $space_free / 1024" | bc)M"
+
+	} | awk '{ printf("%2s\033[34m%6s\t\033[37m%s\033[0m\n", $1, $2, $3) }'
+	exit $?
+}
 
 list_handlers() {
-	printf '%s\n' X-browse X-browse-p TTY-browse View Edit Dload Aplay Vplay Img
+	printf '%s\n'\
+		X-browse X-browse-p TTY-browse View Edit Dload Aplay Vplay Img Pdf
 	echo
 }
 
@@ -35,14 +52,19 @@ menu() {
 		  -nb "#$(goco bg)" -nf "#$(goco 8)" -sb "#$(goco bg)" -sf "#$(goco 3)"
 }
 
+xfer() {
+	wget -qO "$OUT".tmp "$1" && mv "$OUT".tmp "$OUT"
+}
+
 case "$(list_handlers | sort -r | menu)" in
 	X-browse)    exec $chrome "$LINK" & ;;
 	X-browse-p)  exec $chrome_p "$LINK" & ;;
 	TTY-browse)  $new_tab term-link $tty_browse "$LINK" & ;;
-	View)        $new_tab term-view "$xfer $LINK | $pager" & ;;
-	Edit)        $xfer "$LINK" > "$OUT" && $new_tab term-edit $editor "$OUT" & ;;
-	Dload)       $xfer "$LINK" > "$OUT" & ;;
-	Img)         $xfer "$LINK" > "$OUT" && exec $img_open "$OUT" & ;;
+	View)        xfer "$LINK" && $new_tab term-view $pager  "$OUT" & ;;
+	Edit)        xfer "$LINK" && $new_tab term-edit $editor "$OUT" & ;;
+	Dload)       xfer "$LINK" & ;;
+	Doc)         xfer "$LINK" && exec open "$OUT" & ;;
+	Img)         xfer "$LINK" && exec open "$OUT" & ;;
 	Aplay)       $new_tab tune-stream $aplay "$LINK" & ;;
 	Vplay)       exec $vplay "$LINK" & ;;
 	*)           printf 'Error: %s\n' 'Invalid option'  && exit 1 ;;
@@ -50,3 +72,18 @@ esac
 
 exit $?
 # vim set ft=sh noet:
+runcmd() {
+	# comment
+	tmux new-window -n "$(basename $0)" "$*"
+}
+
+
+#	    Icecat) exec  ff "$LINK" ;;
+	    #Icecat) (exec icecat-launcher "$LINK") ;;
+#	      text) (exec tmux new-window -n "$(basename $0)" curl -s "$LINK" | less && read q);;
+#	     Other) exec uopen "$LINK" ;;
+#		  Copy) exec echo "$LINK" | xclip -selection clipboard ;;
+#		Clipdl) exec uopen "$(xclip -selection clipboard -o)" ;;
+#	         *) exec tmux new-window -n "$(basename $0)" "$BROWSER" "$LINK" ;;
+#	            #tmux new-window -n "$(basename $0)" sh -c "$LINK" ;;
+	#FONT='PragmataPro:style=Regular:pixelsize=14:antialias=true'

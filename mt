@@ -9,7 +9,7 @@ RD="$($FG 1)"
 RS="$(tput sgr0)"
 
 usage() {
-	cat <<- EOF
+	printf "%s\n" "
 ${GR}${PROGNAME}${RS} - A tiny wrapper around udisks2/udisksctl to mount/unmount block devices
 
 Usage: ${GR}${PROGNAME}${RS} <device>
@@ -23,10 +23,10 @@ Examples:
     Multiple block device
         ${GR}${PROGNAME}${RS} /dev/sd{a,b,c}1
         ${GR}${PROGNAME}${RS} /dev/sdb[1-5]
-	EOF
+"
 }
 
-test $# -lt 1 && {
+[ $# -lt 1 ] && {
 	printf "${RD}Error${RS}: %s\n" 'No arguments provided'
 	usage && exit 1
 }
@@ -42,12 +42,12 @@ _umount() {
 _runcmd() {
 	ARG="$1"
 
-	test ! -b "$ARG" && {
-	printf "${RD}Error:${RS} %s\n" "device ${ARG}: not found"
+	[ ! -b "$ARG" ] && {
+	printf "${RD}Error:${RS} %s\n" "${ARG}: is an invalid device"
 	exit 1
 	}
 
-	if df | grep -q "$ARG"; then
+	if mount | grep -q "$ARG"; then
 		_umount "$ARG"
 	else
 		_mount  "$ARG"

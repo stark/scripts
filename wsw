@@ -1,0 +1,106 @@
+#!/bin/sh
+# WIP
+
+# grepping window id
+widgrep() {
+	grep -o '0x[A-Fa-f0-9]*'
+}
+
+# list currently focused window's id
+_pfw() {
+	xprop -root _NET_ACTIVE_WINDOW | widgrep
+}
+
+# list all currently visible ( mapped ) window id(s)
+_lsw() {
+	xprop -root _NET_CLIENT_LIST | widgrep
+}
+
+# print window name
+_wname() {
+	# _NET_WM_NAME
+	xargs -I _WID_ xprop -id _WID_ WM_NAME \
+		| awk -F '=' '/=/ { print $2 }' \
+		| sed 's/^ "//; s/"$//'
+}
+
+# transfer window focus
+_wtf() {
+	xdotool search --name "$1" windowactivate
+}
+
+_wattr() {
+	attr="$(echo $1 | sed 's/[^ ]/& /g')"
+	shift
+	wids="$@"
+	alias winfo='xwininfo -id $wid | awk'
+
+	for wid in $wids; do
+		for arg in $attr; do
+			case "$arg" in
+				i)
+					printf '%s ' $wid
+					;;
+				x)
+					winfo '/X:/ && !/Relative/ { printf("%d ", $NF) }'
+					;;
+				y)
+					winfo '/Y:/ && !/Relative/ { printf("%d ", $NF }'
+					;;
+				w)
+					winfo '/Width:/  { printf("%d ", $NF) }'
+					;;
+				h)
+					winfo '/Height:/ { printf("%d ", $NF) }'
+					;;
+				b)
+					winfo '/Border Width:/ { printf("%d ", $NF) }'
+					;;
+				m)
+					winfo '/Map State:/ { if($NF != "IsViewable") { exit 1 } }'
+					exit $?
+					;;
+				o)
+					winfo '/Override Redirect State:/ { if($NF == "no") { exit 1 } }'
+					exit $?
+			esac
+		done
+		echo
+	done
+}
+
+_wmenu() {
+	dmenu -i -nf "#`goco 4`" -sb "#`goco 5`" -fn Hack:size=10 -l 10
+}
+
+prefix_add() {
+	wid="$(_lsw | grep `_pfw`)"
+
+	if [ -n "$wid" ]; then
+		w="$(echo $wid | _wname)"
+		sed "s#^#&\[ \]\ #; s#^\[ \]\ $w#\[\*\]\ $w#"
+	else
+		# Don't mark window if nothing is focused
+		sed "s#^#&\[ \]\ #"
+	fi
+	unset wid
+}
+
+prefix_rm() {
+	sed 's#^\[ \] ##; s#^\[\*\] ##'
+}
+
+escapify() {
+	sed 's/\?/\\&/g'
+}
+
+DEST="$(_lsw | _wname | prefix_add | _wmenu | prefix_rm | escapify)"
+#DEST="$(_lsw | _wname | _wmenu)"
+
+if [ -n "$DEST" ]; then
+	_wtf "$DEST"
+else
+	printf 'Error: %s\n' 'No input provided'
+	exit 1
+fi
+# vim: set ft=sh noet:

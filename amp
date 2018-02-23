@@ -1,12 +1,11 @@
 #!/bin/sh
-# mpv wrapper for playing audio
 
 # Uncomment PRINTMOD, so that mpv prepends module name to each console message.
 # Helpful when we want to disable a particular module through --msg-level
 #PRINTMOD='--msg-module'
 
-MSG_LVL='cplayer=no:ffmpeg/demuxer=no:ffmpeg/audio=no:ad=no'
-OPTS="$PRINTMOD --no-video --msg-level=$MSG_LVL"
+MSG_LVL='cplayer=no:ffmpeg=no:ffmpeg/demuxer=no:ffmpeg/audio=no:ad=no'
+OPTS="$PRINTMOD --no-cache --no-video --msg-level=$MSG_LVL --gapless-audio=yes"
 
 # Hide the cursor
 tput civis
