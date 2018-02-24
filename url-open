@@ -1,4 +1,6 @@
 #!/bin/sh
+# about: do stuff with http URLs
+# inspired by z3bra's link-open script http://git.z3bra.org/scripts/file/link-open.html
 
 pager="less -siR"
 editor="vim"
@@ -72,18 +74,3 @@ esac
 
 exit $?
 # vim set ft=sh noet:
-runcmd() {
-	# comment
-	tmux new-window -n "$(basename $0)" "$*"
-}
-
-
-#	    Icecat) exec  ff "$LINK" ;;
-	    #Icecat) (exec icecat-launcher "$LINK") ;;
-#	      text) (exec tmux new-window -n "$(basename $0)" curl -s "$LINK" | less && read q);;
-#	     Other) exec uopen "$LINK" ;;
-#		  Copy) exec echo "$LINK" | xclip -selection clipboard ;;
-#		Clipdl) exec uopen "$(xclip -selection clipboard -o)" ;;
-#	         *) exec tmux new-window -n "$(basename $0)" "$BROWSER" "$LINK" ;;
-#	            #tmux new-window -n "$(basename $0)" sh -c "$LINK" ;;
-	#FONT='PragmataPro:style=Regular:pixelsize=14:antialias=true'

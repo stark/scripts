@@ -3,7 +3,7 @@
 # goco -- Simple script for extracting color codes from Xresource database
 
 # Comment this var if you do not want to strip '#' from the color codes
-REMOVE_PREFIX='-F#'
+RM_PREFIX='-F#'
 
 # Script name
 PROGNAME="$(basename $0)"
@@ -43,66 +43,67 @@ Examples:
 
 # Color query
 colq() {
-	case $1 in
-		bg)
-			# Background
-			xrdb -query | awk $REMOVE_PREFIX '/background/ {print $2}'
-			;;
-		fg)
-			# Foreground
-			xrdb -query | awk $REMOVE_PREFIX '/foreground/ {print $2}'
-			;;
-		[0-9] | 1[0-5])
-			# Color 0 to 15
-			sh -c "xrdb -query | awk $REMOVE_PREFIX '/^\*color$1:/ {print \$2}'"
-			;;
-		*)
-			printf 'Error: %s\n' 'Invalid color number/name'
-			_usage && exit 1
-			;;
-	esac
+	xrdb -query | awk -v query="${1}:" $RM_PREFIX '$1 ~ query { print $NF }'
 }
 
 for OPT in $@; do
 	case $OPT in
-		bg)        colq bg
+		bg)
+			colq background
 			;;
-		fg)        colq fg
+		fg)
+			colq foreground
 			;;
-		blkf | 0)  colq 0
+		blkf | 0)
+			colq color0
 			;;
-		redf | 1)  colq 1
+		redf | 1)
+			colq color1
 			;;
-		grnf | 2)  colq 2
+		grnf | 2)
+			colq color2
 			;;
-		ylwf | 3)  colq 3
+		ylwf | 3)
+			colq color3
 			;;
-		bluf | 4)  colq 4
+		bluf | 4)
+			colq color4
 			;;
-		magf | 5)  colq 5
+		magf | 5)
+			colq color5
 			;;
-		cynf | 6)  colq 6
+		cynf | 6)
+			colq color6
 			;;
-		whtf | 7)  colq 7
+		whtf | 7)
+			colq color7
 			;;
-		blkb | 8)  colq 8
+		blkb | 8)
+			colq color8
 			;;
-		redb | 9)  colq 9
+		redb | 9)
+			colq color9
 			;;
-		grnb | 10) colq 10
+		grnb | 10)
+			colq color10
 			;;
-		ylwb | 11) colq 11
+		ylwb | 11)
+			colq color11
 			;;
-		blub | 12) colq 12
+		blub | 12)
+			colq color12
 			;;
-		magb | 13) colq 13
+		magb | 13)
+			colq color13
 			;;
-		cynb | 14) colq 14
+		cynb | 14)
+			colq color14
 			;;
-		whtb | 15) colq 15
+		whtb | 15)
+			colq color15
 			;;
 		*)
-			printf 'Error: %s\n' 'Unknown Option'
+			printf 'Error: %s\n' 'Invalid color number/name'
 			_usage && exit 1
 			;;
 	esac
