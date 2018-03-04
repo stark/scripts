@@ -1,0 +1,15 @@
+#!/bin/sh
+# about: interactively choose and open a man page from a specific section
+# menu opts 
+OPTS="-i -b -l 4"
+
+[ -n "$DISPLAY" ] && alias menu="xmenu $OPTS" || alias menu="slmenu $OPTS"
+
+# If no section is specified then choose interactively from the list
+SEC="${1:-$(man -k . | cut -d ' ' -f 2 | sort | uniq | menu -p Section)}"
+
+tmux -q has-session && alias term="xargs tmux new-window" || \
+	                   alias term="xargs st -e"
+
+man -k . | awk -v q="$SEC" '$2 ~ q { print }'  | nl -s '' -n ln | menu -p $SEC \
+	| awk '{ sub("\\(",""); sub("\\)",""); print $3 " " $2 }' | term man
