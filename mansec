@@ -9,8 +9,7 @@ OPTS="-i -b -l 4"
 [ -n "$1" ] && SEC="($1)" || \
 	SEC="$(man -k . | cut -d ' ' -f 2 | sort | uniq | menu -p Section)"
 
-tmux -q has-session && alias term="xargs tmux new-window" || \
-	                   alias term="xargs st -e"
+tmux -q has-session && alias term="tmux new-window" || alias term="st -e"
 
-man -k . | awk -v q="$SEC" '$2 == q { print }'  | nl -s '' -n ln | menu -p $SEC \
-	| awk '{ sub("\\(",""); sub("\\)",""); print $3 " " $2 }' | term man
+man -k . | awk -v q="$SEC" '$2 == q { print }' | nl -s '' -n ln | menu -p $SEC \
+	| awk '{ sub("\\(",""); sub("\\)",""); print $3 " " $2 }' | xargs term man
