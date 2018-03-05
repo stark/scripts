@@ -1,15 +1,17 @@
 #!/bin/sh
 # about: interactively choose and open a man page from a specific section
+# usage: mansec <section> (0p, 1p, 3p, and so on ...)
 # menu opts 
 OPTS="-i -b -l 4"
+alias nl="nl -s '' -n ln"
 
 [ -n "$DISPLAY" ] && menu="xmenu $OPTS" || menu="slmenu $OPTS"
 
 # If no section is specified then choose interactively from the list
 [ -n "$1" ] && SEC="($1)" || \
-	SEC="$(man -k . | cut -d ' ' -f 2 | sort | uniq | $menu -p Section)"
+	SEC="$(man -k . | nl | awk '{ print $3 }' | sort | uniq | $menu -p Section)"
 
-tmux -q has-session && term="tmux new-window" || term="st -e"
+tmux -q has-session 2> /dev/null && term="tmux new-window" || term="st -e"
 
-man -k . | awk -v q="$SEC" '$2 == q { print }' | nl -s '' -n ln | $menu -p $SEC\
+man -k . | awk -v q="$SEC" '$2 == q { print }' | nl | $menu -p $SEC \
 	| awk '{ sub("\\(",""); sub("\\)",""); print $3 " " $2 }' | xargs $term man
