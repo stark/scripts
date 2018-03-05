@@ -1,0 +1,27 @@
+#!/bin/sh
+# simple random password generator
+# number of characters in the password ( default is 30 )
+BYTES=30
+# number of passwords to generate ( default is 1 )
+LINES=1
+# characters to include in the password
+CHARSET="A-Za-z0-9!@#$%^&*()"
+
+while [ -n "$1" ]; do
+	case $1 in
+		-h) echo "usage: ${0##*/} -n <num> -c <num> (without any option a 30 character password is generated"
+			echo "example: generate 4 different passwords, with 30 character in each)"
+			echo "${0##*/} -c 4 -n 30"
+			exit 0 ;;
+		-c) shift; BYTES=$1 ;;
+		-n) shift; LINES=$1 ;;
+		 *) $0 -h; exit 1   ;;
+	esac
+	shift
+done
+
+while [ $LINES -ge 1 ]; do
+	tr -cd [$CHARSET] < /dev/urandom | dd count=1 bs=$BYTES 2> /dev/null
+	echo
+	LINES=$((LINES - 1))
+done
