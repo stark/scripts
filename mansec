@@ -7,9 +7,9 @@ alias nl="nl -s '' -n ln"
 
 [ -n "$DISPLAY" ] && menu="xmenu $OPTS" || menu="slmenu $OPTS"
 
-# If no section is specified then choose interactively from the list
+# If no section is specified then interactively choose from the list
 [ -n "$1" ] && SEC="($1)" || \
-	SEC="$(man -k . | nl | awk '{ print $3 }' | sort | uniq | $menu -p Section)"
+	SEC="$(man -k . | cut -d ' ' -f 2 | sort | uniq | nl | $menu -p Section | awk '{ print $NF }')"
 
 tmux -q has-session 2> /dev/null && term="tmux new-window" || term="st -e"
 
