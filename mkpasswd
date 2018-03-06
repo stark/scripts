@@ -7,15 +7,20 @@ LINES=1
 # characters to include in the password
 CHARSET="A-Za-z0-9!@#$%^&*()"
 
+usage() {
+	echo "usage: ${0##*/} -n <no. of characters> -c <no. of passwords>"
+	echo "(without any option a 30 character password is generated)"
+	echo
+	echo "ex: generate 4 different passwords with 30 characters in each"
+	echo "${0##*/} -c 4 -n 30"
+}
+
 while [ -n "$1" ]; do
 	case $1 in
-		-h) echo "usage: ${0##*/} -n <num> -c <num> (without any option a 30 character password is generated"
-			echo "example: generate 4 different passwords, with 30 character in each)"
-			echo "${0##*/} -c 4 -n 30"
-			exit 0 ;;
+		-h) usage && exit 0 ;;
 		-c) shift; BYTES=$1 ;;
 		-n) shift; LINES=$1 ;;
-		 *) $0 -h; exit 1   ;;
+		 *) $0 -h && exit 1 ;;
 	esac
 	shift
 done
