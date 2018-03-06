@@ -1,0 +1,3 @@
+#!/bin/sh
+# autotype from a file/stdin
+xdotool type --file ${1:-'-'}
