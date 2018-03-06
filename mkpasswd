@@ -26,7 +26,7 @@ while [ -n "$1" ]; do
 done
 
 while [ $LINES -ge 1 ]; do
-	tr -cd [$CHARSET] < /dev/urandom | dd count=1 bs=$BYTES 2> /dev/null
+	tr -cd "$CHARSET" < /dev/urandom | dd count=1 bs=$BYTES 2> /dev/null
 	echo
 	LINES=$((LINES - 1))
 done
