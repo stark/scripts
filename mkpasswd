@@ -1,5 +1,7 @@
 #!/bin/sh
 # simple random password generator
+# thanks z3bra ! http://git.z3bra.org/scripts/file/mkpasswd.html
+
 # number of characters in the password ( default: 30 )
 BYTES=30
 # number of passwords to generate ( default: 1 )
@@ -38,7 +40,6 @@ done
 # character set for the password
 CHARSET="A-Za-z0-9${SYM}"
 
-tr -cd "$CHARSET" < /dev/urandom \
-	| dd count=$NUM bs=$BYTES iflag=fullblock 2> /dev/null \
-	| fold -w $BYTES
+tr -cd "$CHARSET" < /dev/urandom | fold -w $BYTES | sed ${NUM}q
+#	| dd count=$NUM bs=$BYTES iflag=fullblock 2> /dev/null | fold -w $BYTES
 echo
