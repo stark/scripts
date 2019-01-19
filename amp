@@ -5,12 +5,12 @@
 #PRINTMOD='--msg-module'
 
 MSG_LVL='cplayer=no:ffmpeg=no:ffmpeg/demuxer=no:ffmpeg/audio=no:ad=no'
-OPTS="$PRINTMOD --no-cache --no-video --msg-level=$MSG_LVL --gapless-audio=yes"
+OPTS="$PRINTMOD --no-cache  --cache-default=no --no-video --msg-level=$MSG_LVL --gapless-audio=yes"
 
 # Hide the cursor
 tput civis
 
-mpv $OPTS "$@"
+exec mpv $OPTS "$@"
 
 # Show the cursor
 tput cnorm
